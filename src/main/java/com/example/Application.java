@@ -1,13 +1,13 @@
-package com.ushan.dev;
+package com.example;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringBootTddApplication {
+public class Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringBootTddApplication.class, args);
+		SpringApplication.run(Application.class, args);
 	}
 
 }
