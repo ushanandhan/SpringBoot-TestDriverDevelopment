@@ -1,8 +1,7 @@
-package com.example.specs
+package com.example.controller
 
 import com.example.model.Car
-import com.example.service.CarService
-import org.junit.runner.RunWith
+import com.example.service.CarServiceTest
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -10,20 +9,19 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit4.SpringRunner
 import spock.lang.Specification
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-@ActiveProfiles("Test")
+@ActiveProfiles("test")
 class CarControllerSpecs extends Specification {
 
     @Autowired
     TestRestTemplate restTemplate
 
     @MockBean
-    CarService carService
+    CarServiceTest carService
 
     def "Get Car Details by name"(){
         given:

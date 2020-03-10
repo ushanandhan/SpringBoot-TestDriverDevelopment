@@ -1,4 +1,4 @@
-package com.example.specs;
+package com.example.controller;
 
 import com.example.model.Car;
 import com.example.service.CarService;

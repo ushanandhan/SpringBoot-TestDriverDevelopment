@@ -1,8 +1,9 @@
-package com.example.specs;
+package com.example.controller;
 
 import com.example.exception.CarNotFoundException;
 import com.example.model.Car;
 import com.example.service.CarService;
+import com.example.service.CarServiceTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -20,7 +21,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest
-@ActiveProfiles("Test")
+@ActiveProfiles("test")
+//@TestPropertySource(locations = "classpath:application-test.properties")
 public class CarControllerTest {
 
     @Autowired
