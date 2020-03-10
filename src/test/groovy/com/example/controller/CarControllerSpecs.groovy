@@ -1,6 +1,7 @@
 package com.example.controller
 
 import com.example.model.Car
+import com.example.service.CarService
 import com.example.service.CarServiceTest
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,11 +22,11 @@ class CarControllerSpecs extends Specification {
     TestRestTemplate restTemplate
 
     @MockBean
-    CarServiceTest carService
+    CarService carService
 
     def "Get Car Details by name"(){
         given:
-        carService.getCarDetails(Mockito.anyString())>>new Car("Scala","Sadan")
+        Mockito.when(carService.getCarDetails(Mockito.anyString())).thenReturn(new Car("Scala","Sadan"));
 
         when:
         def response = restTemplate.getForEntity('/cars/Scala', Car)
