@@ -17,9 +17,17 @@ public class CarController {
     @Autowired
     CarService carService;
 
-    @GetMapping("{name}")
+    @GetMapping("/{name}")
     public ResponseEntity<Car> getCarDetails(@PathVariable String name) throws Exception{
         Car car = carService.getCarDetails(name);
+        return new ResponseEntity<>(car, HttpStatus.OK);
+    }
+
+    @GetMapping("/{name}/rate")
+    public ResponseEntity<Car> getCarInterest(@PathVariable String name) throws Exception{
+        int rate = carService.getIntrestRateForCar(name);
+        Car car = carService.getCarDetails(name);
+        car.setRate(rate);
         return new ResponseEntity<>(car, HttpStatus.OK);
     }
 }

@@ -1,10 +1,6 @@
 package com.example.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name="CARS")
@@ -19,6 +15,9 @@ public class Car {
 
     @Column
     private String type;
+
+    @Transient
+    private int rate;
 
     public Car() {}
 
@@ -44,6 +43,6 @@ public class Car {
     public void setId(Long id) {
         this.id = id;
     }
-
-
+    public int getRate() {  return rate;    }
+    public void setRate(int rate) {  this.rate = rate;   }
 }

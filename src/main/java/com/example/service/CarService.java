@@ -12,7 +12,7 @@ public class CarService {
     CarRepository carRepository;
 
     public Car getCarDetails(String name) {
-        return null;
+        return carRepository.findByName(name);
     }
 
     public int getIntrestRateForCar(String name){
