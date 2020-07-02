@@ -41,7 +41,7 @@ Select Spring Boot version and required Libraries.
 ![image](https://user-images.githubusercontent.com/8769673/77244156-24d30900-6c38-11ea-9e61-368ee79c59c0.png)
 
 Since we are going to use Junit 5 along with Spring boot Please include below dependencies too,
-```maven
+```xml
 <dependency>
 	<groupId>org.junit.jupiter</groupId>
 	<artifactId>junit-jupiter-api</artifactId>
@@ -179,7 +179,7 @@ Now we'll execute the test.
 ![image](https://user-images.githubusercontent.com/8769673/86356863-9b958e80-bc8a-11ea-983d-70e0cb12e2b5.png)
 The reason for this that we are passing car object with null values in it. 
 
-Now its time to introduce the power of Mockito to mock the response. As I said earlier Since we are going to focus only on controller we will mock any class which is external to CarController class. In CarController lets change below line,
+Lets assume that from external class CarService, we will get the car details. Base on that assumption, in CarController lets change below line,
 
 ```java
 @Autowired
@@ -191,3 +191,222 @@ public ResponseEntity<Car> getCarDetails(@PathVariable String name) throws Excep
 	return new ResponseEntity<>( car,HttpStatus.OK);
 }
 ```
+Now we need to create CarService class with method getCarDetails without body. 
+
+```java
+@Service
+public class CarService {
+
+    public Car getCarDetails(String name) {
+       return null;
+    }
+}
+```
+
+Its time to introduce the power of Mockito to mock the response. As I said earlier Since we are going to focus only on controller we will mock any class which is external to CarController class. 
+
+Now in CarControllerTest, we are going to mock CarService class and give definition for getCarDetails method present in it. 
+```java
+    @MockBean
+    CarService carService;
+
+    @Test
+    public void getCar_Details() throws Exception{
+        given(carService.getCarDetails(Mockito.anyString())).willReturn(new Car("Scala","Sadan"));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/cars/Scala"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("name").value("Scala"))
+                .andExpect(jsonPath("type").value("Sadan"));
+    }
+```
+Here we are mocking CarService object with @MockBean annotation.
+```java
+given(carService.getCarDetails(Mockito.anyString())).willReturn(new Car("Scala","Sadan"));
+```
+With this line we are defining the behaviour in such a way that, if we pass any String as name it should return new Car details. Now lets run the test once again.
+Yes it is passed.
+
+Lets assume if no car details avaliable for the given name, what would happen. For this scenario we need to create CarNotFoundException class which will be throwed when no car details present for given name. 
+
+```java
+@ResponseStatus(code= HttpStatus.NOT_FOUND)
+public class CarNotFoundException extends RuntimeException {
+
+    public CarNotFoundException() {}
+}
+```
+Again from CarControllerTest we are going to have another test to validate this scenario. 
+```java
+    @Test
+    public void Car_NotFoud_HttpStatus() throws Exception{
+        given(carService.getCarDetails(Mockito.anyString())).willThrow(new CarNotFoundException());
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/cars/Scala"))
+                .andExpect(status().isNotFound());
+    }
+```
+If you run this test method it will work like charm. So now we completed two scenarios one with valid response and another with Exception throwed in Controller class level.
+
+Now lets move to CarService Class. As we know so far we did not touch CarService class as part of CarControllerTest. Now Lets create CarServiceTest which is dedicated to CarService class. 
+
+Here we are going to use only Mockito related setup to ensure that how getCarDetails method is working. Here also we have two scenarios one with valid result from CarRepository and another with CarNotFoundException. Create CarRepository with findByName(name) interface first.
+
+```java
+public interface CarRepository {
+    public Optional<Car> findByName(String name);
+}
+```
+Now create CarServiceTest class,
+```java
+public class CarServiceTest {
+
+    @Mock
+    CarRepository carRepository;
+
+    @InjectMocks
+    CarService carService;
+
+    @BeforeEach
+    public void setUp(){
+        MockitoAnnotations.initMocks(this);
+    }
+
+    @Test
+    public void getCarDetails() throws Exception{
+        given(carRepository.findByName("pulse")).willReturn(Optional.of(new Car("pulse", "hatchback")));
+
+        Car car = carService.getCarDetails("pulse");
+        assertNotNull(car);
+        assertEquals("pulse",car.getName());
+        assertEquals("hatchback",car.getType());
+
+    }
+
+    @Test
+    public void getCar_NotFound_Test(){
+        given(carRepository.findByName("pulse")).willThrow(new CarNotFoundException());
+
+        assertThrows(CarNotFoundException.class, ()-> carService.getCarDetails("pulse"));
+    }
+
+}
+```
+As per above code we can see we did not bother about the logic behin CarRepository class. We are just mocking them by our expectations. we can run now.
+Yes both test methods are passed.
+
+Now lets focus on CarRepository interface. We need to ensure that the CarRepository's method findByName should give us proper data fetched from database. Here we are going to use Embedded H2Database. Under src/main/resources folder add data.sql file just like below,
+```sql
+DROP TABLE IF EXISTS CARS;
+
+CREATE TABLE CARS (
+  id INT AUTO_INCREMENT  PRIMARY KEY,
+  name VARCHAR(250) NOT NULL,
+  type VARCHAR(250) NOT NULL
+);
+
+INSERT INTO CARS (id, name, type) VALUES ('1001','duster','hybrid');
+INSERT INTO CARS (id, name, type) VALUES ('1002','micra','hatchback');
+INSERT INTO CARS (id, name, type) VALUES ('1003','lodgy','suv');
+```
+What will happen here is that when we run @DataJpaTest annotated CarRepositoryTest class, these data will be stored in H2 Database untill the execution of test method is over. 
+
+Create CarRepositoryTest Class,
+```java
+@ExtendWith(SpringExtension.class)
+@DataJpaTest
+class CarRepositoryTest {
+
+    @Autowired
+    private CarRepository carRepository;
+
+    @Test
+    public void testFindByName() {
+        Optional<Car> car = carRepository.findByName("duster");
+        assertTrue(car.isPresent());
+    }
+
+    @Test
+    public void testFindByName_Not_Found(){
+        Optional<Car> car = carRepository.findByName("pulse");
+        assertFalse(car.isPresent());
+    }
+}
+```
+Lets run this,
+![image](https://user-images.githubusercontent.com/8769673/86366509-7dcf2600-bc98-11ea-98a6-d67f97544d7c.png)
+Yes these cases passed. If you see the highlighted part, the query is executed to fetch the data from database. 
+
+Now lets focus on Cache test in our application. Lets go and add @EnableCaching to Application class,
+```java
+@SpringBootApplication
+@EnableCaching
+public class Application {
+
+	public static void main(String[] args) {
+		SpringApplication.run(Application.class, args);
+	}
+
+}
+```
+Now go to CarService class and annotate getCarDetails method with @Cacheable("cars").
+
+Lets create CacheTest class. Just be clear that since we are going to verify cache, we need to use @SpringBootTest in this class,
+```java
+@SpringBootTest
+public class CacheTest {
+
+    @MockBean
+    CarRepository carRepository;
+
+    @Autowired
+    CarService carService;
+
+    @Test
+    void cacheTest() {
+        given(carRepository.findByName("pulse")).willReturn(Optional.of(new Car("pulse", "hatchback")));
+
+        Car car = carService.getCarDetails("pulse");
+        assertNotNull(car);
+        carService.getCarDetails("pulse");
+
+        Mockito.verify(carRepository,Mockito.times(1)).findByName("pulse");
+
+    }
+}
+```
+Here with the help of Mockito's verify method we are ensuring that carRepository's findByName method is called only once,though we called carService.getCarDetails() twice.
+
+Now let create IntegrationTest class to ensure entire flow is working fine.
+
+```java
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class IntegrationTest {
+
+    @LocalServerPort
+    private int port;
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @Autowired
+    CarService carService;
+
+    HttpHeaders headers = new HttpHeaders();
+
+    @Test
+    public void getCarDetails() throws Exception {
+        HttpEntity<String> entity = new HttpEntity<String>(null,headers);
+        ResponseEntity<Car> response = restTemplate.exchange(
+                "http://localhost:"+port+"/cars/duster", HttpMethod.GET, entity, Car.class);
+        assertEquals(HttpStatus.OK,response.getStatusCode());
+        assertEquals("hybrid",response.getBody().getType());
+    }
+}
+```
+If we run all Test at once we may get following out put from Intelij,
+![image](https://user-images.githubusercontent.com/8769673/86367899-28941400-bc9a-11ea-8142-b5dfe3e031bd.png)
+
+So finally we came to end of the session. That all about Test Driven Development approach towards creation of Spring Boot application. 
