@@ -1,4 +1,4 @@
-package com.example.model;
+package com.example.demo.model;
 
 import javax.persistence.*;
 
@@ -15,9 +15,6 @@ public class Car {
 
     @Column
     private String type;
-
-    @Transient
-    private int rate;
 
     public Car() {}
 
@@ -43,6 +40,6 @@ public class Car {
     public void setId(Long id) {
         this.id = id;
     }
-    public int getRate() {  return rate;    }
-    public void setRate(int rate) {  this.rate = rate;   }
+
+
 }
