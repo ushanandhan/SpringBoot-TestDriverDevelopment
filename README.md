@@ -203,7 +203,8 @@ public class CarService {
 }
 ```
 
-Its time to introduce the power of Mockito to mock the response. As I said earlier Since we are going to focus only on controller we will mock any class which is external to CarController class. 
+## 2.3 Introduction of Mockito
+As I said earlier Since we are going to focus only on controller we will mock any class which is external to CarController class. 
 
 Now in CarControllerTest, we are going to mock CarService class and give the definition for getCarDetails method present in it. 
 ```java
@@ -251,6 +252,7 @@ If you run this test method it will work like charm. So far we completed two sce
 
 Now lets move to CarService Class. As we know so far we did not touch CarService class as part of CarControllerTest. Now Lets create CarServiceTest which is dedicated to CarService class. 
 
+## 2.4 Service Unit Test
 Here we are going to use only Mockito related setup to ensure that how getCarDetails method is working. Here also we have two scenarios one with valid result from CarRepository and another with CarNotFoundException. Create CarRepository with findByName(name) interface first.
 
 ```java
@@ -296,6 +298,7 @@ public class CarServiceTest {
 As per above code we can see we did not bother about the logic behind CarRepository class. We are just mocking them by our expectations. we can run now.
 Yes both test methods are passed.
 
+## 2.5 Repository Unit Test
 Now lets focus on CarRepository interface. We need to ensure that the CarRepository's method findByName should give us proper data fetched from database. Here we are going to use Embedded H2Database. Under src/main/resources folder add data.sql file just like below,
 ```sql
 DROP TABLE IF EXISTS CARS;
@@ -338,6 +341,7 @@ Lets run this,
 ![image](https://user-images.githubusercontent.com/8769673/86366509-7dcf2600-bc98-11ea-98a6-d67f97544d7c.png)
 Yes these cases passed. If you see the highlighted part, the query is executed to fetch the data from database. 
 
+## 2.6 Cache Test
 Now lets focus on Cache test in our application. Lets go and add @EnableCaching to Application class,
 ```java
 @SpringBootApplication
@@ -378,6 +382,7 @@ public class CacheTest {
 ```
 Here with the help of Mockito's verify method we are ensuring that carRepository's findByName method is called only once,though we called carService.getCarDetails() twice.
 
+## 2.7 Integration Test
 Now let create IntegrationTest class to ensure entire flow is working fine.
 
 ```java
