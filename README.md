@@ -57,7 +57,7 @@ Since we are going to use Junit 5 along with Spring boot Please include below de
 ```
 
 ## 2.2 Let's start with Controller Unit Test
-Let's start from Controller. I'm going to take you to the tour where how step by step programming is happening with the help of Test Driven Development Approach. First we'll create CarControllerTest. Here we are going to create end point for - /cars/{name}.
+Let's start from Controller. I'm going to take you to the tour where how step by step programming is happening with the help of Test Driven Development Approach. First we'll create CarControllerTest. Here we are going to create an end point for - /cars/{name}.
 
 ```java
 @ExtendWith(SpringExtension.class)
@@ -76,7 +76,7 @@ public class CarControllerTest {
 }
 
 ```
-@WebMvcTest(controllers = CarController.class) code will give you error saying that CarController class is not available. Hence we'll go to src/main folder and will create just CarController without Body. 
+At line @WebMvcTest(controllers = CarController.class) code will give you an error saying that CarController class is not available. Hence we'll go to src/main folder and will create just CarController without Body. 
 
 ```java
 public class CarController {
@@ -106,7 +106,7 @@ Once again we'll run the CarControllerTest class.
 ![image](https://user-images.githubusercontent.com/8769673/86356060-42792b00-bc89-11ea-8c54-53727d05dbb5.png)
 Yes it is passed now. Hurray!! guys we created endpoint successfully.
 
-Now are focus it so return the Car details, for which we need Car model. Let's create Car model class under model package.
+Now are focus is to return the Car details, for which we need Car model. Let's create Car model class under model package.
 ```java
 @Entity
 @Table(name="CARS")
@@ -162,7 +162,7 @@ public class CarController {
 }
 ```
 
-Now lets navigate CarControllerTest class and add few more point to existing table as below,
+Now lets navigate to CarControllerTest class and add few more point to existing table as below,
 ```java
 @Test
     public void getCar_Details() throws Exception{
@@ -205,7 +205,7 @@ public class CarService {
 
 Its time to introduce the power of Mockito to mock the response. As I said earlier Since we are going to focus only on controller we will mock any class which is external to CarController class. 
 
-Now in CarControllerTest, we are going to mock CarService class and give definition for getCarDetails method present in it. 
+Now in CarControllerTest, we are going to mock CarService class and give the definition for getCarDetails method present in it. 
 ```java
     @MockBean
     CarService carService;
@@ -225,7 +225,7 @@ Here we are mocking CarService object with @MockBean annotation.
 ```java
 given(carService.getCarDetails(Mockito.anyString())).willReturn(new Car("Scala","Sadan"));
 ```
-With this line we are defining the behaviour in such a way that, if we pass any String as name it should return new Car details. Now lets run the test once again.
+With above line we are defining the behaviour in such a way that, if we pass any String as name it should return new Car details. Now lets run the test once again.
 Yes it is passed.
 
 Lets assume if no car details avaliable for the given name, what would happen. For this scenario we need to create CarNotFoundException class which will be throwed when no car details present for given name. 
@@ -247,7 +247,7 @@ Again from CarControllerTest we are going to have another test to validate this 
                 .andExpect(status().isNotFound());
     }
 ```
-If you run this test method it will work like charm. So now we completed two scenarios one with valid response and another with Exception throwed in Controller class level.
+If you run this test method it will work like charm. So far we completed two scenarios one with valid response and another with Exception throwed in Controller class level.
 
 Now lets move to CarService Class. As we know so far we did not touch CarService class as part of CarControllerTest. Now Lets create CarServiceTest which is dedicated to CarService class. 
 
@@ -293,7 +293,7 @@ public class CarServiceTest {
 
 }
 ```
-As per above code we can see we did not bother about the logic behin CarRepository class. We are just mocking them by our expectations. we can run now.
+As per above code we can see we did not bother about the logic behind CarRepository class. We are just mocking them by our expectations. we can run now.
 Yes both test methods are passed.
 
 Now lets focus on CarRepository interface. We need to ensure that the CarRepository's method findByName should give us proper data fetched from database. Here we are going to use Embedded H2Database. Under src/main/resources folder add data.sql file just like below,
