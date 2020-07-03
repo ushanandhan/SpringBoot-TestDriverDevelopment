@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -25,14 +27,18 @@ public class CacheTest {
 
     @Test
     void cacheTest() {
-        given(carRepository.findByName("pulse")).willReturn(Optional.of(new Car("pulse", "hatchback")));
+        List<Car> carList = new ArrayList<>();
+        carList.add(new Car("pulse", "hatchback"));
+        carList.add(new  Car("duster", "hybrid"));
+        carList.add(new Car("lodgy", "suv"));
+        given(carRepository.findAll()).willReturn(carList);
 
-        Car car = carService.getCarDetails("pulse");
-        assertNotNull(car);
+        List<Car> cars = carService.getAllCars();
+        assertNotNull(cars);
 
-        carService.getCarDetails("pulse");
+        carService.getAllCars();
 
-        Mockito.verify(carRepository,Mockito.times(1)).findByName("pulse");
+        Mockito.verify(carRepository,Mockito.times(1)).findAll();
 
     }
 }
