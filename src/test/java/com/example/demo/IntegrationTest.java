@@ -32,8 +32,8 @@ public class IntegrationTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    @Autowired
-    CarService carService;
+//    @Autowired
+//    CarService carService;
 
     HttpHeaders headers = new HttpHeaders();
 

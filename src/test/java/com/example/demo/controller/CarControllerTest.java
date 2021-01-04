@@ -56,6 +56,20 @@ public class CarControllerTest {
     }
 
     @Test
+    public void testBadRequest() throws Exception{
+        Car car = new Car("pulse", "hatchback");
+        car.setId(Long.valueOf(1003));
+        given(carService.saveOrUpdate(Mockito.any())).willReturn(car);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/cars/")
+                .content(asJsonString(new String("car")))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
     public void getAllCars() throws Exception{
         List<Car> carList = new ArrayList<>();
         carList.add(new Car("pulse", "hatchback"));
@@ -96,6 +110,21 @@ public class CarControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
+                .andExpect(jsonPath("$").isMap())
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetCarById()throws Exception{
+        Car car = new Car("pulse", "hatchback");
+        car.setId(new Long(1003));
+        given(carService.getCarDetailsById(Mockito.anyLong())).willReturn(car);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/cars/carId")
+                .param("id", "1003")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
                 .andDo(print());
     }

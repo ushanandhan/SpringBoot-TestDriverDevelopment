@@ -40,7 +40,7 @@ class CarRepositoryTest {
         carList.forEach(car -> {
             System.out.println(car.getId()+ " :: "+ car.getName()+" :: "+car.getType());
         });
-        assertEquals(3,carList.size());
+        assertEquals(4,carList.size());
     }
 
     @Test
@@ -58,5 +58,10 @@ class CarRepositoryTest {
         carRepository.save(toBeUpdatedCar.get());
         Optional<Car> updateCar = carRepository.findByName("duster");
         assertEquals("SUV",updateCar.get().getType());
+    }
+
+    @Test void testFindCarsByType(){
+        List<Car> cars = carRepository.findByTypeContaining("suv");
+        assertEquals(cars.size(),2);
     }
 }

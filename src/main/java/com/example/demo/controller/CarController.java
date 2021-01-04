@@ -22,6 +22,12 @@ public class CarController {
         return new ResponseEntity<>( car,HttpStatus.OK);
     }
 
+    @GetMapping("/carId")
+    public ResponseEntity<Car> getCarDetailsById(@RequestParam long id) throws Exception {
+        Car car = carService.getCarDetailsById(id);
+        return new ResponseEntity<>( car,HttpStatus.OK);
+    }
+
     @GetMapping("/")
     public List<Car> getAllCars(){
         return carService.getAllCars();
@@ -36,4 +42,5 @@ public class CarController {
     public ResponseEntity<Car> updateCar(@RequestBody Car car) {
         return new ResponseEntity<>(carService.saveOrUpdate(car),HttpStatus.CREATED);
     }
+
 }
