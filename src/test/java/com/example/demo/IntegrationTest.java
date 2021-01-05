@@ -40,7 +40,7 @@ public class IntegrationTest {
     @Test
     public void getCarDetails() throws Exception {
         HttpEntity<String> entity = new HttpEntity<String>(null,headers);
-        ResponseEntity<Car> response = restTemplate.exchange(
+        ResponseEntity<Car> response = restTemplate.withBasicAuth("ushan","nandhan").exchange(
                 "http://localhost:"+port+"/cars/duster", HttpMethod.GET, entity, Car.class);
         assertEquals(HttpStatus.OK,response.getStatusCode());
         assertEquals("hybrid",response.getBody().getType());
@@ -49,14 +49,14 @@ public class IntegrationTest {
     @Test
     public void car_Not_found_Http_Status() throws Exception{
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
-        ResponseEntity<Car> response = restTemplate.exchange(
+        ResponseEntity<Car> response = restTemplate.withBasicAuth("ushan","nandhan").exchange(
                 "http://localhost:"+port+"/cars/scala", HttpMethod.GET, entity, Car.class);
         assertEquals(HttpStatus.NOT_FOUND,response.getStatusCode());
     }
 
     @Test
     public void getAllCars() throws Exception{
-        ResponseEntity<List<Car>> response = restTemplate.exchange(
+        ResponseEntity<List<Car>> response = restTemplate.withBasicAuth("ushan","nandhan").exchange(
                 "http://localhost:"+port+"/cars/",
                 HttpMethod.GET,
                 null,
@@ -69,7 +69,7 @@ public class IntegrationTest {
     @Test
     public void saveCar() throws Exception{
         Car car = new Car("Scala","Sadan");
-        ResponseEntity<Car> response = restTemplate.postForEntity("http://localhost:"+port+"/cars/",
+        ResponseEntity<Car> response = restTemplate.withBasicAuth("ushan","nandhan").postForEntity("http://localhost:"+port+"/cars/",
                 car, Car.class);
         assertEquals(HttpStatus.CREATED,response.getStatusCode());
         assertNotNull(response.getBody().getId());
@@ -78,7 +78,7 @@ public class IntegrationTest {
     @Test
     public void updateCar() throws Exception{
         Car saveCar = new Car("Captur","SUV");
-        ResponseEntity<Car> saveResponse = restTemplate.postForEntity("http://localhost:"+port+"/cars/",
+        ResponseEntity<Car> saveResponse = restTemplate.withBasicAuth("ushan","nandhan").postForEntity("http://localhost:"+port+"/cars/",
                 saveCar, Car.class);
         Car updateCar = saveResponse.getBody();
         updateCar.setType("crossOver");
