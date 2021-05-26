@@ -2,10 +2,9 @@ package com.example.demo.controller;
 
 import com.example.demo.exception.CarNotFoundException;
 import com.example.demo.model.Car;
-import com.example.demo.security.PasswordConfig;
-import com.example.demo.security.SecurityConfig;
 import com.example.demo.service.CarService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -13,15 +12,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -30,8 +32,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = CarController.class)
+//@SpringBootTest
 @ActiveProfiles("test")
-@ContextConfiguration(classes = {PasswordConfig.class, SecurityConfig.class})
 public class CarControllerTest {
 
     @Autowired
@@ -40,6 +42,16 @@ public class CarControllerTest {
     @MockBean
     CarService carService;
 
+    @Autowired
+    WebApplicationContext context;
+
+//    @BeforeEach
+//    public void setUp(){
+//        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+//    }
+
+
+    @WithMockUser(username = "ushan")
     @Test
     public void getCar_Details() throws Exception{
         given(carService.getCarDetails(Mockito.anyString())).willReturn(new Car("Scala","Sadan"));
@@ -51,6 +63,7 @@ public class CarControllerTest {
                 .andExpect(jsonPath("type").value("Sadan"));
     }
 
+
     @Test
     public void Car_NotFoud_HttpStatus() throws Exception{
         given(carService.getCarDetails(Mockito.anyString())).willThrow(new CarNotFoundException());
@@ -58,6 +71,7 @@ public class CarControllerTest {
         mockMvc.perform(get("/cars/Scala"))
                 .andExpect(status().isNotFound());
     }
+
 
     @Test
     public void testBadRequest() throws Exception{
