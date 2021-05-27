@@ -4,7 +4,6 @@ import com.example.demo.exception.CarNotFoundException;
 import com.example.demo.model.Car;
 import com.example.demo.service.CarService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -16,14 +15,11 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -32,7 +28,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = CarController.class)
-//@SpringBootTest
 @ActiveProfiles("test")
 public class CarControllerTest {
 
@@ -41,15 +36,6 @@ public class CarControllerTest {
 
     @MockBean
     CarService carService;
-
-    @Autowired
-    WebApplicationContext context;
-
-//    @BeforeEach
-//    public void setUp(){
-//        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
-//    }
-
 
     @WithMockUser(username = "ushan")
     @Test
@@ -63,7 +49,7 @@ public class CarControllerTest {
                 .andExpect(jsonPath("type").value("Sadan"));
     }
 
-
+    @WithMockUser(username = "ushan")
     @Test
     public void Car_NotFoud_HttpStatus() throws Exception{
         given(carService.getCarDetails(Mockito.anyString())).willThrow(new CarNotFoundException());
@@ -72,7 +58,7 @@ public class CarControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-
+    @WithMockUser(username = "ushan")
     @Test
     public void testBadRequest() throws Exception{
         Car car = new Car("pulse", "hatchback");
@@ -87,6 +73,7 @@ public class CarControllerTest {
                 .andDo(print());
     }
 
+    @WithMockUser(username = "ushan")
     @Test
     public void getAllCars() throws Exception{
         List<Car> carList = new ArrayList<>();
@@ -102,6 +89,7 @@ public class CarControllerTest {
                 .andDo(print());
     }
 
+    @WithMockUser(username = "ushan")
     @Test
     public void saveCar() throws Exception{
         Car car = new Car("pulse", "hatchback");
@@ -117,6 +105,7 @@ public class CarControllerTest {
                 .andDo(print());
     }
 
+    @WithMockUser(username = "ushan")
     @Test
     public void updateCar() throws Exception{
         Car car = new Car("pulse", "hatchback");
@@ -132,6 +121,7 @@ public class CarControllerTest {
                 .andDo(print());
     }
 
+    @WithMockUser(username = "ushan")
     @Test
     public void testGetCarById()throws Exception{
         Car car = new Car("pulse", "hatchback");
