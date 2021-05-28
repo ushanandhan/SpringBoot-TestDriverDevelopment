@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,12 +38,14 @@ public class CarControllerTest {
     @MockBean
     CarService carService;
 
-    @WithMockUser(username = "ushan")
     @Test
     public void getCar_Details() throws Exception{
         given(carService.getCarDetails(Mockito.anyString())).willReturn(new Car("Scala","Sadan"));
 
-        mockMvc.perform(get("/cars/Scala"))
+        mockMvc.perform(
+                    get("/cars/Scala")
+                    .with(SecurityMockMvcRequestPostProcessors.user("user").roles("USER"))
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("name").value("Scala"))
@@ -66,6 +69,7 @@ public class CarControllerTest {
         given(carService.saveOrUpdate(Mockito.any())).willReturn(car);
 
         mockMvc.perform(put("/cars/")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .content(asJsonString(new String("car")))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -96,10 +100,13 @@ public class CarControllerTest {
         car.setId(new Long(1003));
         given(carService.saveOrUpdate(Mockito.any())).willReturn(car);
 
-        mockMvc.perform(post("/cars/")
+        mockMvc.perform(
+                post("/cars/")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .content(asJsonString(new Car("pulse", "hatchback")))
                 .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_JSON)
+                )
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$").isMap())
                 .andDo(print());
@@ -113,6 +120,7 @@ public class CarControllerTest {
         given(carService.saveOrUpdate(Mockito.any())).willReturn(car);
 
         mockMvc.perform(put("/cars/")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .content(asJsonString(new Car("pulse", "hatchback")))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
