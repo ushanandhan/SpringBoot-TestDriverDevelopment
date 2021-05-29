@@ -44,7 +44,7 @@ public class CarControllerTest {
 
         mockMvc.perform(
                     get("/cars/Scala")
-                    .with(SecurityMockMvcRequestPostProcessors.user("user").roles("USER"))
+                    .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
@@ -52,12 +52,15 @@ public class CarControllerTest {
                 .andExpect(jsonPath("type").value("Sadan"));
     }
 
-    @WithMockUser(username = "ushan")
+//    @WithMockUser(username = "ushan")
     @Test
     public void Car_NotFoud_HttpStatus() throws Exception{
         given(carService.getCarDetails(Mockito.anyString())).willThrow(new CarNotFoundException());
 
-        mockMvc.perform(get("/cars/Scala"))
+        mockMvc.perform(
+                get("/cars/Scala")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
+                )
                 .andExpect(status().isNotFound());
     }
 
