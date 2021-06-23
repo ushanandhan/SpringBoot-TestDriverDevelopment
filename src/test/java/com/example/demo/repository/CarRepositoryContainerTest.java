@@ -34,7 +34,7 @@ class CarRepositoryContainerTest {
     private CarRepository carRepository;
 
     @Container
-    private static final PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:9.6.15")
+    private static final PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:11.1")
             .withDatabaseName("users")
             .withUsername("postgres")
             .withPassword("password");
