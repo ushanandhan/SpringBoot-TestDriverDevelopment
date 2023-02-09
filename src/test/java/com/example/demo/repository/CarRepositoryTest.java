@@ -1,5 +1,6 @@
 package com.example.demo.repository;
 
+import com.example.demo.dto.CarDto;
 import com.example.demo.model.Car;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,8 +61,18 @@ class CarRepositoryTest {
         assertEquals("SUV",updateCar.get().getType());
     }
 
-    @Test void testFindCarsByType(){
+    @Test
+    void testFindCarsByType(){
         List<Car> cars = carRepository.findByTypeContaining("suv");
         assertEquals(cars.size(),2);
+    }
+
+    /**
+     * This is to test how joins work in JPA Query Language.
+     */
+    @Test
+    void testFindCarsAndPersons(){
+        List<CarDto> carsAndPersons = carRepository.findCarsAndPersons();
+        System.out.println(carsAndPersons);
     }
 }
